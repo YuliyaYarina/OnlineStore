@@ -47,7 +47,7 @@ public class SimpleProduct extends Product{
 
     @Override
     public String toString() {
-        return "<" + getName() + ">:" +
+        return "<" + getName() + ">: " +
                 "<" + getPrice() +
                 '>' + "\n";
     }

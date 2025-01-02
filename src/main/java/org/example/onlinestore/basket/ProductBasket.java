@@ -59,7 +59,7 @@ public class ProductBasket implements ProductBasketImpl{
        String su = "";
         if (getSalaryProductBasket() != 0) {
             for (Product value : products) {
-                if (value != null) su += value + "\n";
+                if (value != null) su += value ;
             }
             return su + "Итого: " + '<' + getSalaryProductBasket() + '>' + "\n" +
                      "Специальных товаров: " + '<' + specialProducts + '>';
