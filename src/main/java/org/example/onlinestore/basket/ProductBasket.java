@@ -3,7 +3,10 @@ package org.example.onlinestore.basket;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.onlinestore.product.DiscountedProduct;
+import org.example.onlinestore.product.FixPriceProduct;
 import org.example.onlinestore.product.Product;
+import org.example.onlinestore.product.SimpleProduct;
 import org.springframework.stereotype.Service;
 
 @Data
@@ -12,25 +15,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductBasket implements ProductBasketImpl{
 
-    private Product[] product = new Product[5];
+    private Product[] products;
+    private int maxSize = 5;
+    private int currentCount;
+    private byte specialProducts;
+
+    public ProductBasket() {
+        this.products = new Product[maxSize];
+//        this.maxSize = maxSize;
+        this.currentCount = 0;
+        this.specialProducts = 0;
+    }
 
     @Override
-    public Product addProductBasket(Product productAdd) throws RuntimeException {
-        if (productAdd == null) throw new NullPointerException("Product is null");
+    public void addProductBasket(Product product){
+        if (product == null) throw new NullPointerException("Product is null");
 
-        for (int i = 0; i < product.length ; i++) {
-            if (product[i] == null) {
-                product[i] = productAdd;
-                return product[i];
+        if (currentCount < maxSize){
+            products[currentCount++] = product;
+            if (product.getIsSpecial()){
+                specialProducts++;
             }
+        }else {
+            throw new IndexOutOfBoundsException("Невозможно добавить продукт");
         }
-        throw new IndexOutOfBoundsException("Невозможно добавить продукт");
     }
 
     @Override
     public int getSalaryProductBasket() {
         int sum = 0;
-        for (Product value : product) {
+        for (Product value : products) {
             if (value != null) {
                 sum += value.getPrice();
             }else
@@ -39,14 +53,16 @@ public class ProductBasket implements ProductBasketImpl{
         return sum;
     }
 
+
     @Override
     public String getSumProductBasket() {
        String su = "";
         if (getSalaryProductBasket() != 0) {
-            for (Product value : product) {
-                if (value != null) su += value + "\n";
+            for (Product value : products) {
+                if (value != null) su += value ;
             }
-            return su + "Итого: " + '<' + getSalaryProductBasket() + '>';
+            return su + "Итого: " + '<' + getSalaryProductBasket() + '>' + "\n" +
+                     "Специальных товаров: " + '<' + specialProducts + '>';
         }else {
             return "в корзине пусто";
         }
@@ -54,7 +70,7 @@ public class ProductBasket implements ProductBasketImpl{
 
     @Override
     public boolean checkedProductBasket(String productName) {
-        for (Product value : product) {
+        for (Product value : products) {
             if (value == null) continue;
             if (value.getName().equals(productName)) {
                 return true;
@@ -65,10 +81,10 @@ public class ProductBasket implements ProductBasketImpl{
 
     @Override
     public void removeAllProductBasket() {
-        for (int i = 0; i < product.length; i++) {
-            product[i] = null;
+        for (int i = 0; i < products.length; i++) {
+            products[i] = null;
         }
-        product = new Product[]{};
+        products = new Product[]{};
     }
 
 }
