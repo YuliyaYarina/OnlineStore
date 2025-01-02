@@ -4,7 +4,7 @@ import org.example.onlinestore.product.Product;
 
 public interface ProductBasketImpl {
 
-    Product addProductBasket(Product productAdd) throws Exception;
+    void addProductBasket(Product productAdd) throws RuntimeException;
 
     int getSalaryProductBasket();
 

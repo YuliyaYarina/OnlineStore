@@ -1,42 +1,33 @@
 package org.example.onlinestore.product;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Objects;
+import org.example.onlinestore.basket.ProductBasket;
 
 @Data
 @Setter
 @Getter
-public class Product {
-//    private long id;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DiscountedProduct.class, name = "discounted"),
+        @JsonSubTypes.Type(value = FixPriceProduct.class, name = "fixed"),
+        @JsonSubTypes.Type(value = SimpleProduct.class, name = "simple")
+})
+abstract public class Product {
+
     private String name;
-    private int price;
+    private boolean isSpecial;
 
-    public Product(String name, int price) {
-//        this.id++;
+    public Product(String name) {
         this.name = name;
-        this.price = price;
     }
 
-    @Override
-    public String toString() {
-        return  "<" + name +
-                '>' + ": " +
-                '<' + price +
-                '>';
-    }
+    abstract public void addProduct(ProductBasket basket);
+    abstract public int getPrice();
+    abstract public boolean getIsSpecial();
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return price == product.price && Objects.equals(name, product.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, price);
-    }
 }
