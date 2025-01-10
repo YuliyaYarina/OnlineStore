@@ -3,10 +3,7 @@ package org.example.onlinestore.basket;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.onlinestore.product.DiscountedProduct;
-import org.example.onlinestore.product.FixPriceProduct;
-import org.example.onlinestore.product.Product;
-import org.example.onlinestore.product.SimpleProduct;
+import org.example.onlinestore.searchable.product.Product;
 import org.springframework.stereotype.Service;
 
 @Data
@@ -22,7 +19,6 @@ public class ProductBasket implements ProductBasketImpl{
 
     public ProductBasket() {
         this.products = new Product[maxSize];
-//        this.maxSize = maxSize;
         this.currentCount = 0;
         this.specialProducts = 0;
     }

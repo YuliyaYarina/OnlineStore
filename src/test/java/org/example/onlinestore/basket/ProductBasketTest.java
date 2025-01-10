@@ -1,9 +1,9 @@
 package org.example.onlinestore.basket;
 
-import org.example.onlinestore.product.DiscountedProduct;
-import org.example.onlinestore.product.FixPriceProduct;
-import org.example.onlinestore.product.Product;
-import org.example.onlinestore.product.SimpleProduct;
+import org.example.onlinestore.searchable.product.DiscountedProduct;
+import org.example.onlinestore.searchable.product.FixPriceProduct;
+import org.example.onlinestore.searchable.product.Product;
+import org.example.onlinestore.searchable.product.SimpleProduct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

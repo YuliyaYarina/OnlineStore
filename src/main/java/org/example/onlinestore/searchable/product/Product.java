@@ -1,4 +1,4 @@
-package org.example.onlinestore.product;
+package org.example.onlinestore.searchable.product;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.onlinestore.basket.ProductBasket;
+import org.example.onlinestore.searchable.Searchable;
 
 @Data
 @Setter
@@ -17,7 +18,9 @@ import org.example.onlinestore.basket.ProductBasket;
         @JsonSubTypes.Type(value = FixPriceProduct.class, name = "fixed"),
         @JsonSubTypes.Type(value = SimpleProduct.class, name = "simple")
 })
-abstract public class Product {
+abstract public class Product implements Searchable {
+
+    public static final String RETURN_THE_PRODUCT_NAME = "PRODUCT";
 
     private String name;
     private boolean isSpecial;

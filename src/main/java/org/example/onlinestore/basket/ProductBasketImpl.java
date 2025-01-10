@@ -1,6 +1,6 @@
 package org.example.onlinestore.basket;
 
-import org.example.onlinestore.product.Product;
+import org.example.onlinestore.searchable.product.Product;
 
 public interface ProductBasketImpl {
 
