@@ -1,4 +1,4 @@
-package org.example.onlinestore.product;
+package org.example.onlinestore.searchable.product;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -53,5 +53,20 @@ public class DiscountedProduct extends Product {
                 "<" + getPrice() +
                 '>' + " (<" + salaryInPercents +
                 ">%)" + "\n";
+    }
+
+    @Override
+    public String getSearchTerm() {
+        return this.getName();
+    }
+
+    @Override
+    public String getTypeContent() {
+        return "PRODUCT";
+    }
+
+    @Override
+    public String getStringRepresentation() {
+        return super.getStringRepresentation();
     }
 }

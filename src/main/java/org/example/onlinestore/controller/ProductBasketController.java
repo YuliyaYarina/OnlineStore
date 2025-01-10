@@ -1,15 +1,10 @@
 package org.example.onlinestore.controller;
 
 import org.example.onlinestore.basket.ProductBasketImpl;
-import org.example.onlinestore.product.DiscountedProduct;
-import org.example.onlinestore.product.FixPriceProduct;
-import org.example.onlinestore.product.Product;
-import org.example.onlinestore.product.SimpleProduct;
+import org.example.onlinestore.searchable.product.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static org.example.onlinestore.product.FixPriceProduct.FIX_PRICE;
 
 @RestController
 @RequestMapping
