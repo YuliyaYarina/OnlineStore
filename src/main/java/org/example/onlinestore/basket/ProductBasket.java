@@ -18,7 +18,11 @@ public class ProductBasket implements ProductBasketImpl{
     private byte specialProducts;
 
     public ProductBasket() {
-        this.products = new Product[maxSize];
+        try {
+            this.products = new Product[maxSize];
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e + e.getMessage());
+        }
         this.currentCount = 0;
         this.specialProducts = 0;
     }
@@ -26,14 +30,13 @@ public class ProductBasket implements ProductBasketImpl{
     @Override
     public void addProductBasket(Product product){
         if (product == null) throw new NullPointerException("Product is null");
-
         if (currentCount < maxSize){
-            products[currentCount++] = product;
-            if (product.getIsSpecial()){
-                specialProducts++;
-            }
-        }else {
-            throw new IndexOutOfBoundsException("Невозможно добавить продукт");
+                products[currentCount++] = product;
+                if (product.getIsSpecial()){
+                    specialProducts++;
+                }
+            }else {
+                throw new IndexOutOfBoundsException("Невозможно добавить продукт");
         }
     }
 
@@ -80,7 +83,11 @@ public class ProductBasket implements ProductBasketImpl{
         for (int i = 0; i < products.length; i++) {
             products[i] = null;
         }
-        products = new Product[]{};
+        try {
+            products = new Product[]{};
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e + e.getMessage() +"!!!");
+        }
     }
 
 }

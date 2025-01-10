@@ -10,11 +10,14 @@ import java.util.Objects;
 @Getter
 public class SimpleProduct extends Product{
 
-    private final int price;
+    private int price;
 
     public SimpleProduct(String name, int price) {
         super(name);
-        this.price = price;
+        if (price > 0){
+            this.price = price;
+        }else
+            throw new IllegalArgumentException("basePrice must be greater than zero");
     }
 
     @Override
