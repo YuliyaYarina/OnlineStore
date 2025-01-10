@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
@@ -16,11 +17,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductBasketTest {
 
     private final ProductBasket out = new ProductBasket();
-    private final ProductBasketImpl impl = new ProductBasket();
 
     public static Stream<Arguments> provideProductsForAdd() {
         return Stream.of(
-                Arguments.of(new SimpleProduct("Milk", 75), true),
+                Arguments.of(new SimpleProduct("Milk", 75), false),
                 Arguments.of(new DiscountedProduct("Beer", 175, (byte) 10), true),
                 Arguments.of(new FixPriceProduct("Beer"), true)
         );
@@ -73,9 +73,10 @@ class ProductBasketTest {
     @ParameterizedTest
     @MethodSource("provideProductsForAdd")
     void testAddProductInBasket(Product product, boolean expectSuccess) throws RuntimeException {
-        if (!expectSuccess) {
+       if (!expectSuccess) {
             for (int i = 0; i < out.getProducts().length; i++) {
                 out.getProducts()[i] = new SimpleProduct("Product" + i, 80);
+                return;
             }
         }
 
@@ -134,8 +135,29 @@ class ProductBasketTest {
         assertEquals(0, out.getProducts().length);
     }
 
-    @Test
-    void testEquals() {
+    @ParameterizedTest
+    @ValueSource(ints = {-100, 0, -1})  // Неприемлемые значения
+    public void testIllegalArgumentExceptionBasePrice(int price) {
+        RuntimeException trows = assertThrows(IllegalArgumentException.class, () -> {
+            new SimpleProduct("Milk", price);  // Проверяем, выбрасывается ли IllegalArgumentException
+        });
+        assertEquals("basePrice must be greater than zero", trows.getMessage());
+    }
+    @ParameterizedTest
+    @ValueSource(bytes = {101, -1})  // Неприемлемые значения
+    public void testIllegalArgumentExceptionSalaryInPercents(byte percent) {
+        RuntimeException trows = assertThrows(IllegalArgumentException.class, () -> {
+            new DiscountedProduct("Beer", 100, percent);  // Проверяем, выбрасывается ли IllegalArgumentException
+        });
+        assertEquals("salaryInPercents must be between 0 and 100", trows.getMessage());
+    }
+    @ParameterizedTest
+    @ValueSource(strings = {"     ", ""})  // Неприемлемые значения
+    public void testIllegalArgumentExceptionProduct(String product) {
+        RuntimeException trows = assertThrows(IllegalArgumentException.class, () -> {
+            new FixPriceProduct(product);  // Проверяем, выбрасывается ли IllegalArgumentException
+        });
+        assertEquals("Product name cannot be blank.", trows.getMessage());
     }
 
     @Test

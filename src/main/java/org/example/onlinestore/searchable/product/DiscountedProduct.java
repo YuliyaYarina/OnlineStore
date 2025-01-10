@@ -13,10 +13,17 @@ public class DiscountedProduct extends Product {
    private int basePrice;
    private byte salaryInPercents;
 
-    public DiscountedProduct(String name, int basePrice, byte salaryInPercents) {
+    public DiscountedProduct(String name, int basePrice, byte salaryInPercents){
         super(name);
-        this.basePrice = basePrice;
-        this.salaryInPercents = salaryInPercents;
+        if (basePrice > 0){
+            this.basePrice = basePrice;
+        }else
+           throw new IllegalArgumentException("basePrice must be greater than zero");
+
+        if (salaryInPercents >= 0 && salaryInPercents <= 100) {
+            this.salaryInPercents = salaryInPercents;
+        }else
+            throw new IllegalArgumentException("salaryInPercents must be between 0 and 100");
     }
 
     @Override

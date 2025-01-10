@@ -1,5 +1,6 @@
 package org.example.onlinestore.searchable;
 
+import org.example.onlinestore.exception.BestResultNotFound;
 import org.example.onlinestore.searchable.product.DiscountedProduct;
 import org.example.onlinestore.searchable.product.FixPriceProduct;
 import org.example.onlinestore.searchable.product.SimpleProduct;
@@ -30,8 +31,8 @@ class SearchEngineTest {
                 Arguments.of(new SimpleProduct("Milk", 75)),
                 Arguments.of(new DiscountedProduct("Beer", 175, (byte) 10)),
                 Arguments.of(new FixPriceProduct("Beers")),
-                Arguments.of(new Article("Title_", "text_"))
-//                Arguments.of(null)
+                Arguments.of(new Article("Title_", "text_")),
+                Arguments.of((Object) null)
                 );
     }
 
@@ -57,8 +58,7 @@ class SearchEngineTest {
     @MethodSource("provideAdd")
     void add(Searchable searchable) {
         if (searchable == null) {
-         assertThrows(NullPointerException.class, () -> out.add(searchable), "Product is null");
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> out.add(searchable));
+            RuntimeException exception = assertThrows(NullPointerException.class, () -> out.add(searchable));
             assertEquals("Product is null", exception.getMessage());
         }else {
             assertDoesNotThrow(() -> out.add(searchable));
@@ -66,5 +66,39 @@ class SearchEngineTest {
             assertEquals(searchable.toString(), out.toString());
         }
     }
+
+    public static Stream<Arguments> providerSearchTerm() {
+        return Stream.of(
+                Arguments.of("ers", new FixPriceProduct("Beers")),
+                Arguments.of("Mil", new SimpleProduct("Milk", 75)),
+                Arguments.of("Title", new Article("Title_", "text_"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("providerSearchTerm")
+    void testGetSearchTerm(String searchable, Searchable object) throws BestResultNotFound {
+            assertEquals(object, out.getSearchTerm(searchable));
+    }
+    public static Stream<Arguments> providerSearchError() {
+        return Stream.of(
+                Arguments.of("Gasers", new BestResultNotFound("Для поискового запроса " + "Gasers" + " не нашлось подходящей статьи")),
+                Arguments.of(null, new NullPointerException("Search is null"))
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("providerSearchError")
+    void testGetSearchTermError(String searchable, RuntimeException exception) throws BestResultNotFound {
+
+        if (searchable == null) {
+            RuntimeException exc = assertThrows(NullPointerException.class, () -> out.getSearchTerm(searchable));
+            assertEquals(exc.getMessage(), exception.getMessage());
+        }else {
+            RuntimeException exc = assertThrows(BestResultNotFound.class, () -> out.getSearchTerm(searchable));
+            assertEquals(exc.getMessage(), exception.getMessage());
+        }
+    }
+
+
 
 }

@@ -26,7 +26,10 @@ abstract public class Product implements Searchable {
     private boolean isSpecial;
 
     public Product(String name) {
-        this.name = name;
+        if (!name.isBlank()) {
+            this.name = name;
+        }else
+            throw new IllegalArgumentException("Product name cannot be blank.");
     }
 
     abstract public void addProduct(ProductBasket basket);
