@@ -77,21 +77,6 @@ public class SearchEngine {
             }
         }
         throw new BestResultNotFound("Для поискового запроса " + search + " не нашлось подходящей статьи");
-
-
-//        Searchable[] arrayNew = new Searchable[DIMENSION_OF_ARRAY];
-//
-//        for (int i = 0; i < searchables.length; i++) {
-//            if (searchables[i] != null && searchables[i].toString().contains(string)) {
-//                for (int j = 0; j < MAX_SIZE_SEARCH; j++) {
-//                    if (arrayNew[j] == null) {
-//                        arrayNew[j] = searchables[i];
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return arrayNew;
     }
 
 }
