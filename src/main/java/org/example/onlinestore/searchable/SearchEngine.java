@@ -5,31 +5,28 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.onlinestore.exception.BestResultNotFound;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Setter
 @Getter
 public class SearchEngine {
 
-    private Searchable[] searchables;
+    private List<Searchable> searchables;
 
-    private static final int MAX_SIZE_SEARCH = 5;
     private static final int DIMENSION_OF_ARRAY = 10;
 
     public SearchEngine() {
-        this.searchables = new Searchable[DIMENSION_OF_ARRAY];
+        this.searchables = new ArrayList<>(DIMENSION_OF_ARRAY);
     }
 
-    public Searchable[] search(String string) {
-        Searchable[] arrayNew = new Searchable[DIMENSION_OF_ARRAY];
+    public List<Searchable> search(String string) {
+        List<Searchable> arrayNew = new ArrayList<>(DIMENSION_OF_ARRAY);
 
-        for (int i = 0; i < searchables.length; i++) {
-            if (searchables[i] != null && searchables[i].toString().contains(string)) {
-                for (int j = 0; j < MAX_SIZE_SEARCH; j++) {
-                    if (arrayNew[j] == null) {
-                        arrayNew[j] = searchables[i];
-                        break;
-                    }
-                }
+        for (int i = 0; i < searchables.size(); i++) {
+            if (searchables.get(i) != null && searchables.get(i).toString().contains(string)) {
+                arrayNew.add(searchables.get(i));
             }
         }
         return arrayNew;
@@ -38,21 +35,16 @@ public class SearchEngine {
     public void add(Searchable searchable) {
         if (searchable == null) throw new NullPointerException("Product is null");
 
-        for (int i = 0; i < searchables.length; i++) {
-            if (searchables[i] == null) {
-                searchables[i] = searchable;
-                break;
-            }
-        }
-        if (searchables[9] != null) throw new RuntimeException("Maximum search limit reached");
+      searchables.add(searchable);
+//        if (searchables.get(9) != null) throw new RuntimeException("Maximum search limit reached");
     }
 
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
-        for (int i = searchables.length - 1; i >= 0; i--) {
-            if (searchables[i] != null) {
-                b.append(this.searchables[i]);
+        for (int i = searchables.size()- 1; i >= 0; i--) {
+            if (searchables.get(i) != null) {
+                b.append(this.searchables.get(i).toString());
                 break;
             }
         }
