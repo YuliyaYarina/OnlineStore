@@ -3,6 +3,7 @@ package org.example.onlinestore.searchable;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.onlinestore.exception.BestResultNotFound;
 
 @Data
 @Setter
@@ -56,6 +57,26 @@ public class SearchEngine {
             }
         }
         return b.toString();
+    }
+    /** возвращает объект, который getSearchTerm() содержит максимальное количество повторов строки
+     search **/
+    public Searchable getSearchTerm(String search) throws BestResultNotFound {
+
+        if (search == null) throw new NullPointerException("Search is null");
+        int count = 0;
+        int index= 0;
+        int indexStringOf = 0;
+        for (Searchable searchable : searchables) {
+            if (searchable == null) break;
+            indexStringOf = searchable.toString().indexOf(search,index);
+            while (indexStringOf != -1) {
+                count++;
+                index += search.length();
+                indexStringOf = searchable.getStringRepresentation().indexOf(search,index);
+                return searchable;
+            }
+        }
+        throw new BestResultNotFound("Для поискового запроса " + search + " не нашлось подходящей статьи");
     }
 
 }
