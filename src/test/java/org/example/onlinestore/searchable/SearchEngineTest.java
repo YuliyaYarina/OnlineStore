@@ -9,6 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,19 +40,23 @@ class SearchEngineTest {
 
     public static Stream<Arguments> searchProvider() {
         return Stream.of(
-                Arguments.of("Mil", new Searchable[]{new SimpleProduct("Milk", 75)}),
-                Arguments.of("Title", new Searchable[]{new Article("Title_", "text_")}),
-                Arguments.of("Tomato", new Searchable[]{})
-        );
+                Arguments.of("Mil", new ArrayList<Searchable>(){{
+                    new SimpleProduct("Milk", 75);
+            }}),
+                Arguments.of("Title", new ArrayList<Searchable>(){{
+                new Article("Title_", "text_");
+            }}),
+                Arguments.of("Tomato", new ArrayList<Searchable>()
+        ));
     }
 
     @ParameterizedTest
     @MethodSource("searchProvider")
-     void searchT(String query, Searchable[] expected) {
-        Searchable[] result = out.search(query);
+     void searchT(String query, List<Searchable> expected) {
+        List<Searchable> result = out.search(query);
 
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i].toString(), result[i].toString());
+        for (int i = 0; i < expected.size(); i++) {
+            assertEquals(expected.get(i).toString(), result.get(i).toString());
         }
     }
 
