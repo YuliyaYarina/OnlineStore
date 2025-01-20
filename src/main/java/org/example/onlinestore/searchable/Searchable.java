@@ -11,6 +11,4 @@ public interface Searchable {
                 getTypeContent() +
                 "-объекта";
     }
-
-
 }
