@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,22 +36,31 @@ class ProductBasketTest {
                 Arguments.of(null, "Product is null")
         );
     }
+
     public static Stream<Arguments> provideForSumProducts() {
         return Stream.of(
-                Arguments.of(new LinkedList<Product>(), 0),
-                Arguments.of(new LinkedList<Product>(){{
-                    add(new FixPriceProduct("Apple"));
-                    add(new SimpleProduct("Banana", 20));
+                Arguments.of(new TreeMap<String, Product>(){}, 0),
+                Arguments.of(new TreeMap<String, List<Product>>() {{
+                    put("Apple", new LinkedList<>(){{
+                        add(new FixPriceProduct("Apple"));
+                    }});
+                    put("Banana",new LinkedList<>(){{
+                        add(new SimpleProduct("Banana", 20));
+                    }});
                 }}, 119)
         );
     }
 
     public static Stream<Arguments> provideBasketForSumProducts() {
         return Stream.of(
-                Arguments.of(new LinkedList<Product>(), "в корзине пусто"),
-                Arguments.of( new LinkedList<Product>() {{
-                    add(new SimpleProduct("Apple", 10));
-                    add(new SimpleProduct("Banana", 20));
+                Arguments.of(new TreeMap<String, List<Product>>(), "в корзине пусто"),
+                Arguments.of( new TreeMap<String, List<Product>>() {{
+                    put("Apple", new LinkedList<Product>(){{
+                        add(new SimpleProduct("Apple", 10));
+                    }});
+                    put("Banana", new LinkedList<Product>(){{
+                        add(new SimpleProduct("Banana", 20));
+                    }});
                 }} , """
                         <Apple>: <10>
                         <Banana>: <20>
@@ -59,30 +70,30 @@ class ProductBasketTest {
     }
     public static Stream<Arguments> provideCheckedForTrueProducts() {
         return Stream.of(
-                Arguments.of(new LinkedList<Product>(), "Shower", false),
-                Arguments.of( new LinkedList<Product>(){{
-                    add(new SimpleProduct("Apple", 10));
-                    add(new SimpleProduct("Banana", 20));
+                Arguments.of(new TreeMap<>(), "Shower", false),
+                Arguments.of( new TreeMap<String, Product>() {{
+                    put("Apple", new SimpleProduct("Apple", 10));
+                    put("Banana",new SimpleProduct("Banana", 20));
                 }}, "Shower", false),
-                Arguments.of( new LinkedList<Product>(){{
-                    add(new SimpleProduct("Apple", 10));
-                            add(new SimpleProduct("Banana", 20));
-                            add(new SimpleProduct("Shower", 500));
+                Arguments.of( new TreeMap<String, Product>() {{
+                    put("Apple",new SimpleProduct("Apple", 10));
+                            put("Banana",new SimpleProduct("Banana", 20));
+                            put("Shower",new SimpleProduct("Shower", 500));
                 }}, "Shower" , true)
         );
     }
     public static Stream<Arguments> provideDeletedAllForProducts() {
         return Stream.of(
-                Arguments.of(new LinkedList<Product>()),
-                Arguments.of(new LinkedList<Product>(){{
-                        add(new SimpleProduct("Apple", 10));
-                        add(new SimpleProduct("Banana", 20));
+                Arguments.of(new TreeMap<String,Product>()),
+                Arguments.of(new TreeMap<String, Product>() {{
+                    put("Apple", new SimpleProduct("Apple", 10));
+                        put("Banana", new SimpleProduct("Banana", 20));
                     }}
                 ),
-                Arguments.of(new LinkedList<Product>(){{
-                        add(new SimpleProduct("Apple", 10));
-                        add(new SimpleProduct("Banana", 20));
-                        add(new SimpleProduct("Shower", 500));
+                Arguments.of(new TreeMap<String, Product>(){{
+                        put("Apple",new SimpleProduct("Apple", 10));
+                        put("Banana", new SimpleProduct("Banana", 20));
+                        put("Shower",new SimpleProduct("Shower", 500));
                 }}
                 )
         );
@@ -94,7 +105,7 @@ class ProductBasketTest {
 
 //        if (expectSuccess) {
             out.addProductBasket(product);
-            assertEquals(product.getPrice(), out.getProducts().getFirst().getPrice());
+            assertEquals(product.getPrice(), out.getProducts().get(product.getName()).getFirst().getPrice());
 //        }
 //        else {
 //            RuntimeException exception = assertThrows(IndexOutOfBoundsException.class, () -> out.addProductBasket(product));
@@ -112,7 +123,7 @@ class ProductBasketTest {
 
     @ParameterizedTest
     @MethodSource("provideForSumProducts")
-    void getSalaryProductBasket(List<Product> product, int sum) {
+    void getSalaryProductBasket(Map<String, List<Product>> product, int sum) {
         out.setProducts(product);
 
         int result = out.getSalaryProductBasket();
@@ -122,7 +133,7 @@ class ProductBasketTest {
 
     @ParameterizedTest
     @MethodSource("provideBasketForSumProducts")
-    void testGetSumProductBasket(List<Product> products, String expectedMessage) {
+    void testGetSumProductBasket(Map<String, List<Product>> products, String expectedMessage) {
         out.setProducts(products);
 
         String result = out.getSumProductBasket();
@@ -132,7 +143,7 @@ class ProductBasketTest {
 
     @ParameterizedTest
     @MethodSource("provideCheckedForTrueProducts")
-    void checkedProductBasket(List<Product> products, String productName, boolean expectSuccess) throws RuntimeException {
+    void checkedProductBasket(Map<String, List<Product>> products, String productName, boolean expectSuccess) throws RuntimeException {
         out.setProducts(products);
 
         Boolean result = out.checkedProductBasket(productName);
@@ -141,7 +152,7 @@ class ProductBasketTest {
 
     @ParameterizedTest
     @MethodSource("provideDeletedAllForProducts")
-    void removeAllProductBasket(List<Product> product) {
+    void removeAllProductBasket(Map<String, List<Product>> product) {
         out.setProducts(product);
         out.removeAllProductBasket();
 

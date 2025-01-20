@@ -27,7 +27,7 @@ public final class Article implements Searchable{
 
     @Override
     public String getSearchTerm() {
-        return this.toString();
+        return this.getTitle();
     }
 
     @Override
