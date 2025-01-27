@@ -2,7 +2,6 @@ package org.example.onlinestore.controller;
 
 import org.example.onlinestore.basket.ProductBasketImpl;
 import org.example.onlinestore.searchable.product.Product;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,8 +9,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 public class ProductBasketController {
 
-    @Autowired
-    private ProductBasketImpl productBasket;
+    private final ProductBasketImpl productBasket;
+
+    public ProductBasketController(ProductBasketImpl productBasket) {
+        this.productBasket = productBasket;
+    }
 
     @PostMapping
     public ResponseEntity<Product> addProductBasket(@RequestBody Product product) throws RuntimeException{

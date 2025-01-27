@@ -13,6 +13,7 @@ import java.util.*;
 @Data
 @Getter
 @Setter
+
 @Service
 public class ProductBasket implements ProductBasketImpl{
 
@@ -29,20 +30,12 @@ public class ProductBasket implements ProductBasketImpl{
     @Override
     public void addProductBasket(Product product){
         if (product == null) throw new NullPointerException("Product is null");
-        List<Product> add;
-
-        if (!checkedProductBasket(product.getName())){
-            add = products.put(product.getName(), new LinkedList<>(){{
+        products.put(product.getName(), new LinkedList<>(){{
                 add(product);
-            }});
+        }});
             if (product.getIsSpecial()) specialProducts++;
-            logger.info(" products.get(product.getName()).add(product)==== " +  add);
-        }else {
-            products.get(product.getName()).add(product);  // добавляет только 1 экземпляр товара, данный метод предположительно не работает
-            logger.info("Added product " + product.getName() + " to the basket");
-            logger.info(" products.get(product.getName()).add(product)= " +  products.get(product.getName()).add(product));
+//            products.get(product.getName()).add(product);  // добавляет только 1 экземпляр товара, данный метод предположительно не работает
         }
-    }
 
     @Override
     public int getSalaryProductBasket() {
@@ -50,7 +43,6 @@ public class ProductBasket implements ProductBasketImpl{
         for(Map.Entry<String, List<Product>> product: products.entrySet()){
             if (!product.getValue().isEmpty()){
                 sum += product.getValue().getFirst().getPrice();
-                logger.info("sum = " + sum);
             }
         }
         return sum;
@@ -63,7 +55,6 @@ public class ProductBasket implements ProductBasketImpl{
         if (getSalaryProductBasket() != 0) {
             for (Map.Entry<String, List<Product>> product: products.entrySet()) {
                 su.append(product.getValue().getFirst().toString());
-                logger.info("getSumProductBasket.su ==" + su);
             }
             return su + "Итого: " + '<' + getSalaryProductBasket() + '>' + "\n" +
                      "Специальных товаров: " + '<' + specialProducts + '>';
