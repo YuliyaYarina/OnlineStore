@@ -9,8 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,53 +32,51 @@ class SearchEngineTest {
     public static Stream<Arguments> provideAdd() {
         return Stream.of(
                 Arguments.of(new SimpleProduct("Milka", 756),
-                        new TreeMap<String, Searchable>(){{
-                            put("Milka", new SimpleProduct("Milka", 756));
+                        new HashSet<Searchable>(){{
+                            add(new SimpleProduct("Milka", 756));
                 }}),
-                Arguments.of(new DiscountedProduct("Beer", 175, (byte) 10),  new TreeMap<String, Searchable>(){{
-                    put("Beer", new DiscountedProduct("Beer", 175, (byte) 10));
-                    put("Beers", new FixPriceProduct("Beers"));
+                Arguments.of(new DiscountedProduct("Beers", 175, (byte) 10),  new HashSet<>(){{
+                    add( new FixPriceProduct("Beers"));
                 }}),
-                Arguments.of(new FixPriceProduct("Beers"),  new TreeMap<String, Searchable>(){{
-                  put("Beers", new FixPriceProduct("Beers"));
+                Arguments.of(new FixPriceProduct("Beers"),  new HashSet<>(){{
+                  add(new FixPriceProduct("Beers"));
                 }}),
-                Arguments.of(new Article("Title_", "text_"),  new TreeMap<String, Searchable>(){{
-                    put("Title_", new Article("Title_", "text_"));
-                    put("Title_27", new Article("Title_27", "text_26"));
+                Arguments.of(new Article("Title_", "text_"),  new HashSet<>(){{
+                    add(new Article("Title_", "text_"));
+                    add(new Article("Title_27", "text_26"));
                 }}),
-                Arguments.of((Object) null, new TreeMap<String, Searchable>(){})
+                Arguments.of(null, new HashSet<>(){})
                 );
     }
 
     public static Stream<Arguments> searchProvider() {
         return Stream.of(
-                Arguments.of("Mil", new TreeMap<String, Searchable>() {{
-                    put("Milk", new SimpleProduct("Milk", 75));
+                Arguments.of("Mil", new HashSet<>() {{
+                    add(new SimpleProduct("Milk", 75));
             }}),
-                Arguments.of("Title",  new TreeMap<String, Searchable>() {{
-                    put("Title_", new Article("Title_", "text_"));
-                    put("Title_2", new Article("Title_2", "text_2"));
+                Arguments.of("Title",  new HashSet<>() {{
+                    add(new Article("Title_", "text_"));
+                    add(new Article("Title_2", "text_2"));
             }}),
-                Arguments.of("Tomato",  new TreeMap<String, Searchable>()
+                Arguments.of("Tomato",  new HashSet<>()
                 ));
     }
 
     @ParameterizedTest
     @MethodSource("searchProvider")
-     void searchT(String query, Map<String, Searchable> expected) {
-        Map<String, Searchable> result  = out.search(query);
+     void searchT(String query, Set<Searchable> expected) {
+        Set<Searchable> result  = out.search(query);
 
             assertEquals(result.toString(), result.toString());
     }
 
     @ParameterizedTest
     @MethodSource("provideAdd")
-    void add(Searchable searchable, Map<String, Searchable> expected) {
+    void add(Searchable searchable, Set<Searchable> expected) {
         if (searchable == null) {
             RuntimeException exception = assertThrows(NullPointerException.class, () -> out.add(searchable));
             assertEquals("Product is null", exception.getMessage());
         }else {
-            assertDoesNotThrow(() -> out.add(searchable));
             out.add(searchable);
             assertEquals(expected, out.search(searchable.getSearchTerm()));
         }
@@ -85,15 +84,27 @@ class SearchEngineTest {
 
     public static Stream<Arguments> providerSearchTerm() {
         return Stream.of(
-                Arguments.of("e", new FixPriceProduct("Beers")),
-                Arguments.of("Mil", new SimpleProduct("Milk", 75)),
-                Arguments.of("Title",new Article("Title_27", "text_26"))
+                Arguments.of("e", new LinkedHashSet<>(){
+            {
+                add(new DiscountedProduct("Beer", 175, (byte) 10));
+                add(new FixPriceProduct("Beers"));
+                add(new Article("Title_", "text_"));
+                add(new Article("Title_27", "text_26"));
+            }}),
+                Arguments.of("Mil", new LinkedHashSet<>(){{
+                    add(new SimpleProduct("Milk", 75));
+                }}),
+                Arguments.of("Title",new LinkedHashSet<>(){{
+
+                    add(new Article("Title_", "text_"));
+                    add(new Article("Title_27", "text_26"));
+                }})
         );
     }
 
     @ParameterizedTest
     @MethodSource("providerSearchTerm")
-    void testGetSearchTerm(String searchable, Searchable object) throws BestResultNotFound {
+    void testGetSearchTerm(String searchable,Set<Searchable> object) throws BestResultNotFound {
             assertEquals(object, out.getSearchTerm(searchable));
     }
 

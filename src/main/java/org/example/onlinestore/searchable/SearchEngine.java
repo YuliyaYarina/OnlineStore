@@ -6,8 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.onlinestore.exception.BestResultNotFound;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Slf4j
 @Data
@@ -15,18 +14,28 @@ import java.util.TreeMap;
 @Getter
 public class SearchEngine {
 
-    private Map<String, Searchable> searchables;
+    private Set<Searchable> searchables;
+    Comparator<Searchable> compare = new Comparator<Searchable>() {
+        @Override
+        public int compare(Searchable o1, Searchable o2) {
+            return o2.getSearchTerm().compareTo(o1.getSearchTerm());
+        }
+    };
 
     public SearchEngine() {
-        this.searchables = new TreeMap<>();
+        this.searchables =  new TreeSet<>(compare);
     }
 
-    public Map<String, Searchable> search(String string) {
-        Map<String, Searchable> arrayNew = new TreeMap<>();
-
-        for (Map.Entry<String, Searchable> entry : this.searchables.entrySet()) {
-            if (entry.getKey().contains(string)) {
-                arrayNew.put(entry.getKey(), entry.getValue());
+    public Set<Searchable> search(String string) { // проходит по множеству, проверяет на наличие, и добавляет в новое множество
+        Set<Searchable> arrayNew = new TreeSet<>(new Comparator<Searchable>() {
+            @Override
+            public int compare(Searchable o1, Searchable o2) {
+                return Integer.compare(o1.getSearchTerm().length(), o2.getSearchTerm().length());
+            }
+        });
+        for (Searchable entry : searchables) {
+            if (entry.getSearchTerm().contains(string)) {
+                arrayNew.add(entry);
             }
         }
         return arrayNew;
@@ -34,47 +43,66 @@ public class SearchEngine {
 
     public void add(Searchable searchable) {
         if (searchable == null) throw new NullPointerException("Product is null");
-        searchables.put(searchable.getSearchTerm(), searchable);
- }
+        searchables.add(searchable);
+    }
 
-
-    public String toStringAllSearchable() {
+    public String toStringAllSearchable() { // выводит все значения
         StringBuilder b = new StringBuilder();
-        for (Map.Entry<String, Searchable> entry : this.searchables.entrySet()) {
-            if (searchables.containsKey(entry.getKey())) {
-                b.append(this.searchables.get(entry.getKey()).toString());
-            }
+        Iterator<Searchable> iterator = searchables.iterator();
+        while (iterator.hasNext()) {
+          if (searchables.contains(iterator.next())) {
+                b.append(iterator);
+          }
         }
         return b.toString();
     }
+
     /** возвращает объект, который getSearchTerm() содержит максимальное количество повторов строки
      search **/
-    public Searchable getSearchTerm(String search) throws BestResultNotFound {
+    public Set<Searchable> getSearchTerm(String search) throws BestResultNotFound {
         if (search == null) throw new NullPointerException("Search is null");
 
-        Map<Integer, Searchable> searchableTreeMap = new TreeMap<>();
-        Map<String, Searchable> searched = search(search); // получаем объекты Searchable в которых есть хоть 1 совпадение
-
+        Set<Searchable> searched = search(search); // получаем объекты Searchable в которых есть хоть 1 совпадение
         if (searched.isEmpty())throw new BestResultNotFound("Для поискового запроса " + search + " не нашлось подходящей статьи");
 
+        return returnGetSetSearchable(search, searched);
+    }
+
+
+    private Set<Searchable> returnGetSetSearchable(String search, Set<Searchable> searched) { //  метод высчитывает конкретное кол-во повторов и возвращает от большего числа к меньшему
+
+        Map<Searchable, Integer> linkedHashMap = new LinkedHashMap<>();
+        Set<Searchable> returnSet = new LinkedHashSet<>();
+
         int replay = 0;
-        for (Map.Entry<String, Searchable> entry : searched.entrySet()) {
+        Iterator<Searchable> iterator = searched.iterator();
+        Searchable objectSet = iterator.next();
+        int finish = search.length();
+        int starts = 0;
 
-            int finish = search.length();
-            int starts = 0;
-
-            while (finish <= entry.getKey().length()) { // проходим по объекту и проверяем есть ли еще сходства и считаем их
-                if(entry.getKey().substring(starts, finish).contains(search)) {
+        while (!objectSet.getSearchTerm().isEmpty()) {
+            while (finish <= objectSet.getSearchTerm().length()) { // проходим по объекту и проверяем есть ли еще сходства и считаем их
+                if (objectSet.getSearchTerm().substring(starts, finish).contains(search)) {
                     replay++;
                 }
-                starts ++;
+                starts++;
                 finish++;
             }
-            searchableTreeMap.put(replay, entry.getValue());
+
+            linkedHashMap.put(objectSet, replay);
             replay = 0;
+
+            List<Map.Entry<Searchable, Integer>> sortedEntries = new ArrayList<>(linkedHashMap.entrySet());
+            sortedEntries.sort((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())); // сортировка от числа больших совпадений к меньшим
+
+            returnSet = linkedHashMap.keySet();
+            if (iterator.hasNext()){
+                objectSet = iterator.next();
+            }else
+                break;
         }
-        int lastKay = searchableTreeMap.size();
-        return searchableTreeMap.get(lastKay);
+
+        return returnSet;
     }
 
 }
