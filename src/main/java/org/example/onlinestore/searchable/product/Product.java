@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.example.onlinestore.basket.ProductBasket;
 import org.example.onlinestore.searchable.Searchable;
 
+import java.util.Objects;
+
 @Data
 @Setter
 @Getter
@@ -30,6 +32,19 @@ abstract public class Product implements Searchable {
             this.name = name;
         }else
             throw new IllegalArgumentException("Product name cannot be blank.");
+        this.isSpecial = this.getIsSpecial();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(name, product.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 
     abstract public void addProduct(ProductBasket basket);

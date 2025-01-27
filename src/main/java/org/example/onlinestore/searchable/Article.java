@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Data
 @Setter
 @Getter
@@ -38,5 +40,17 @@ public final class Article implements Searchable{
     @Override
     public String getStringRepresentation() {
         return Searchable.super.getStringRepresentation();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Article article = (Article) o;
+        return Objects.equals(title, article.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(title);
     }
 }
